@@ -10,23 +10,26 @@ def home():
 
 @app.get("/parser")
 def parse_product(url: str = Query(...)):
+    print(f"\n➡️ URL recibida: {url}\n")  # Debug para verificar la URL que llega
+
     headers = {
-        "User-Agent": "Mozilla/5.0"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36"
     }
-    r = requests.get(url, headers=headers)
-    soup = BeautifulSoup(r.text, 'html.parser')
 
-    if "falabella.cl" in url:
+    try:
+        r = requests.get(url, headers=headers, timeout=10)
+        soup = BeautifulSoup(r.text, 'html.parser')
+    except Exception as e:
+        return {"error": f"No se pudo acceder a la página: {str(e)}"}
+
+    if "falabella.cl" in url or "falabella.com" in url:
         try:
-            title = soup.find("h1", class_="jsx-1289233143 product-name").text.strip()
-            price = soup.find("span", class_="jsx-1289233143 copy10 primary medium line-height-24 normal breakword").text.strip()
-            image = soup.find("img", class_="jsx-3974001354")["src"]
-
+            title = soup.find("h1", class_="fb-product-hero__title").text.strip()
+            price = soup.select_one("span.fb-price__sale").text.strip()
             return {
                 "store": "Falabella",
                 "title": title,
-                "price": price,
-                "image": image
+                "price": price
             }
         except Exception as e:
             return {"error": f"No se pudo extraer el producto: {str(e)}"}
