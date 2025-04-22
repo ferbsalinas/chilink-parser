@@ -1,1 +1,5 @@
-fastapiuvicornrequestsbeautifulsoup4
+fastapi==0.95.1
+uvicorn==0.22.0
+selenium==4.10.0
+beautifulsoup4==4.12.2
+requests==2.31.0
