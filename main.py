@@ -18,10 +18,17 @@ def parse_product(url: str = Query(...)):
 
     if "falabella.cl" in url:
         try:
-            title = soup.find("h1", class_="fb-product-hero__title").text.strip()
-            price = soup.select_one("span.fb-price__sale").text.strip()
-            return {"store": "Falabella", "title": title, "price": price}
-        except:
-            return {"error": "No se pudo extraer el producto"}
+            title = soup.find("h1", class_="jsx-1289233143 product-name").text.strip()
+            price = soup.find("span", class_="jsx-1289233143 copy10 primary medium line-height-24 normal breakword").text.strip()
+            image = soup.find("img", class_="jsx-3974001354")["src"]
+
+            return {
+                "store": "Falabella",
+                "title": title,
+                "price": price,
+                "image": image
+            }
+        except Exception as e:
+            return {"error": f"No se pudo extraer el producto: {str(e)}"}
 
     return {"error": "Tienda no soportada"}
