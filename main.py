@@ -24,19 +24,24 @@ def parse_product(url: str = Query(...)):
 
     if "falabella.cl" in url or "falabella.com" in url:
         try:
-            title = soup.find("h1", class_="fb-product-hero__title")
-            price = soup.find("span", class_="fb-price__sale")
+            title_tag = soup.find("h1", class_="fb-product-hero__title")
+            price_tag = soup.select_one("span.fb-price__sale")
+            image_tag = soup.find("img", class_="fb-image-viewer__image")
 
-            if not title or not price:
-                return {"error": "No se pudo extraer el nombre o precio"}
+            if not title_tag or not price_tag or not image_tag:
+                return {"error": "No se pudo extraer el nombre, precio o imagen"}
+
+            title = title_tag.text.strip()
+            price = price_tag.text.strip()
+            image = image_tag["src"]
 
             return {
                 "store": "Falabella",
-                "title": title.text.strip(),
-                "price": price.text.strip()
+                "title": title,
+                "price": price,
+                "image": image
             }
         except Exception as e:
             return {"error": f"No se pudo procesar el producto: {str(e)}"}
 
     return {"error": "Tienda no soportada"}
-
